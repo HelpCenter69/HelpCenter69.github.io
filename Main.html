@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Super Startpage</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+:root{
+--bg:#0f172a;
+--card:#1e293b;
+--text:#fff;
+--accent:#3b82f6;
+}
+
+.light{
+--bg:#f1f5f9;
+--card:#ffffff;
+--text:#111;
+}
+
+body{
+margin:0;
+font-family:system-ui;
+background:var(--bg);
+color:var(--text);
+transition:.3s;
+}
+
+header{
+text-align:center;
+padding:30px;
+}
+
+#clock{
+font-size:52px;
+}
+
+#date{
+opacity:.7;
+}
+
+.search{
+display:flex;
+justify-content:center;
+gap:10px;
+margin-bottom:20px;
+}
+
+.search input{
+width:320px;
+padding:12px;
+border-radius:10px;
+border:none;
+}
+
+.search button{
+padding:12px 16px;
+border:none;
+border-radius:10px;
+background:var(--accent);
+color:white;
+cursor:pointer;
+}
+
+.dashboard{
+display:grid;
+grid-template-columns:2fr 1fr;
+gap:20px;
+padding:20px;
+max-width:1200px;
+margin:auto;
+}
+
+.links{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+gap:15px;
+}
+
+.tile{
+background:var(--card);
+border-radius:12px;
+padding:15px;
+text-align:center;
+cursor:move;
+}
+
+.tile img{
+width:24px;
+height:24px;
+display:block;
+margin:auto;
+margin-bottom:6px;
+}
+
+.widget{
+background:var(--card);
+padding:15px;
+border-radius:12px;
+margin-bottom:15px;
+}
+
+textarea{
+width:100%;
+height:120px;
+border:none;
+background:transparent;
+color:var(--text);
+resize:none;
+outline:none;
+}
+
+.todo input{
+width:100%;
+padding:8px;
+margin-bottom:10px;
+}
+
+.todo-item{
+display:flex;
+justify-content:space-between;
+margin-bottom:5px;
+}
+
+button{
+border:none;
+border-radius:8px;
+padding:6px 10px;
+cursor:pointer;
+}
+
+.controls{
+margin-bottom:10px;
+display:flex;
+gap:10px;
+}
+
+.news-item{
+font-size:14px;
+margin-bottom:6px;
+}
+
+@media(max-width:900px){
+.dashboard{
+grid-template-columns:1fr;
+}
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div id="clock"></div>
+<div id="date"></div>
+
+</header>
+
+<div class="search">
+
+<input id="search" placeholder="Search or command (yt cats)">
+<select id="engine">
+<option value="google">Google</option>
+<option value="duck">DuckDuckGo</option>
+<option value="bing">Bing</option>
+</select>
+
+<button onclick="search()">Search</button>
+
+</div>
+
+<div class="dashboard">
+
+<div>
+
+<div class="controls">
+<button onclick="addLink()">Add Link</button>
+<button onclick="toggleTheme()">Theme</button>
+</div>
+
+<div id="links" class="links"></div>
+
+</div>
+
+<div>
+
+<div class="widget">
+<h3>Weather</h3>
+<div id="weather">Loading...</div>
+</div>
+
+<div class="widget">
+<h3>Notes</h3>
+<textarea id="notes"></textarea>
+</div>
+
+<div class="widget todo">
+<h3>Todo</h3>
+<input id="todoInput" placeholder="Add task">
+<div id="todoList"></div>
+</div>
+
+<div class="widget">
+<h3>News</h3>
+<div id="news"></div>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+/* CLOCK */
+
+function updateClock(){
+let now=new Date()
+clock.innerText=now.toLocaleTimeString()
+date.innerText=now.toDateString()
+}
+
+setInterval(updateClock,1000)
+updateClock()
+
+
+/* SEARCH */
+
+function search(){
+
+let q=search.value.trim()
+
+if(q.startsWith("yt ")){
+location="https://youtube.com/results?search_query="+q.slice(3)
+return
+}
+
+if(q.startsWith("gh ")){
+location="https://github.com/search?q="+q.slice(3)
+return
+}
+
+let e=engine.value
+
+if(e==="google")
+location="https://google.com/search?q="+encodeURIComponent(q)
+
+if(e==="duck")
+location="https://duckduckgo.com/?q="+encodeURIComponent(q)
+
+if(e==="bing")
+location="https://bing.com/search?q="+encodeURIComponent(q)
+
+}
+
+document.addEventListener("keydown",e=>{
+if(e.key==="/"){
+e.preventDefault()
+search.focus()
+}
+if(e.key==="n") addLink()
+})
+
+
+/* LINKS */
+
+let links=JSON.parse(localStorage.getItem("links"))||[
+{name:"YouTube",url:"https://youtube.com"},
+{name:"Reddit",url:"https://reddit.com"},
+{name:"GitHub",url:"https://github.com"},
+{name:"Gmail",url:"https://mail.google.com"}
+]
+
+function renderLinks(){
+
+links.innerHTML=""
+
+links.forEach((l,i)=>{
+
+let div=document.createElement("div")
+div.className="tile"
+div.draggable=true
+
+let icon=`https://www.google.com/s2/favicons?domain=${l.url}&sz=64`
+
+div.innerHTML=`
+<img src="${icon}">
+${l.name}
+`
+
+div.onclick=()=>window.open(l.url)
+
+div.oncontextmenu=e=>{
+e.preventDefault()
+if(confirm("Delete?")){
+links.splice(i,1)
+saveLinks()
+}
+}
+
+div.ondragstart=e=>{
+e.dataTransfer.setData("index",i)
+}
+
+div.ondragover=e=>e.preventDefault()
+
+div.ondrop=e=>{
+let from=e.dataTransfer.getData("index")
+let temp=links[from]
+links.splice(from,1)
+links.splice(i,0,temp)
+saveLinks()
+}
+
+links.appendChild(div)
+
+})
+
+}
+
+function addLink(){
+
+let name=prompt("Name")
+if(!name) return
+
+let url=prompt("URL")
+if(!url) return
+
+links.push({name,url})
+saveLinks()
+
+}
+
+function saveLinks(){
+localStorage.setItem("links",JSON.stringify(links))
+renderLinks()
+}
+
+renderLinks()
+
+
+/* NOTES */
+
+notes.value=localStorage.getItem("notes")||""
+
+notes.oninput=()=>{
+localStorage.setItem("notes",notes.value)
+}
+
+
+/* TODO */
+
+let todos=JSON.parse(localStorage.getItem("todos"))||[]
+
+function renderTodos(){
+
+todoList.innerHTML=""
+
+todos.forEach((t,i)=>{
+
+let div=document.createElement("div")
+div.className="todo-item"
+
+div.innerHTML=`
+<span>${t}</span>
+<button onclick="removeTodo(${i})">X</button>
+`
+
+todoList.appendChild(div)
+
+})
+
+}
+
+todoInput.addEventListener("keydown",e=>{
+if(e.key==="Enter"){
+
+todos.push(todoInput.value)
+todoInput.value=""
+saveTodos()
+
+}
+})
+
+function removeTodo(i){
+todos.splice(i,1)
+saveTodos()
+}
+
+function saveTodos(){
+localStorage.setItem("todos",JSON.stringify(todos))
+renderTodos()
+}
+
+renderTodos()
+
+
+/* THEME */
+
+if(localStorage.getItem("theme")==="light")
+document.body.classList.add("light")
+
+function toggleTheme(){
+
+document.body.classList.toggle("light")
+
+localStorage.setItem(
+"theme",
+document.body.classList.contains("light")
+?"light":"dark"
+)
+
+}
+
+
+/* WEATHER */
+
+navigator.geolocation.getCurrentPosition(pos=>{
+
+let lat=pos.coords.latitude
+let lon=pos.coords.longitude
+
+fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
+.then(r=>r.json())
+.then(data=>{
+
+let w=data.current_weather
+
+weather.innerHTML=
+`Temp: ${w.temperature}°C<br>
+Wind: ${w.windspeed} km/h`
+
+})
+
+})
+
+
+/* NEWS */
+
+fetch("https://api.rss2json.com/v1/api.json?rss_url=https://feeds.bbci.co.uk/news/rss.xml")
+.then(r=>r.json())
+.then(data=>{
+
+news.innerHTML=""
+
+data.items.slice(0,5).forEach(n=>{
+
+let div=document.createElement("div")
+div.className="news-item"
+
+div.innerHTML=`<a href="${n.link}" target="_blank">${n.title}</a>`
+
+news.appendChild(div)
+
+})
+
+})
+
+
+/* RANDOM BACKGROUND */
+
+let images=[
+"https://picsum.photos/1920/1080?1",
+"https://picsum.photos/1920/1080?2",
+"https://picsum.photos/1920/1080?3"
+]
+
+document.body.style.backgroundImage=
+`url(${images[Math.floor(Math.random()*images.length)]})`
+
+document.body.style.backgroundSize="cover"
+document.body.style.backgroundPosition="center"
+
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Super Startpage</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+:root{
+--bg:#0f172a;
+--card:#1e293b;
+--text:#fff;
+--accent:#3b82f6;
+}
+
+.light{
+--bg:#f1f5f9;
+--card:#ffffff;
+--text:#111;
+}
+
+body{
+margin:0;
+font-family:system-ui;
+background:var(--bg);
+color:var(--text);
+transition:.3s;
+}
+
+header{
+text-align:center;
+padding:30px;
+}
+
+#clock{
+font-size:52px;
+}
+
+#date{
+opacity:.7;
+}
+
+.search{
+display:flex;
+justify-content:center;
+gap:10px;
+margin-bottom:20px;
+}
+
+.search input{
+width:320px;
+padding:12px;
+border-radius:10px;
+border:none;
+}
+
+.search button{
+padding:12px 16px;
+border:none;
+border-radius:10px;
+background:var(--accent);
+color:white;
+cursor:pointer;
+}
+
+.dashboard{
+display:grid;
+grid-template-columns:2fr 1fr;
+gap:20px;
+padding:20px;
+max-width:1200px;
+margin:auto;
+}
+
+.links{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+gap:15px;
+}
+
+.tile{
+background:var(--card);
+border-radius:12px;
+padding:15px;
+text-align:center;
+cursor:move;
+}
+
+.tile img{
+width:24px;
+height:24px;
+display:block;
+margin:auto;
+margin-bottom:6px;
+}
+
+.widget{
+background:var(--card);
+padding:15px;
+border-radius:12px;
+margin-bottom:15px;
+}
+
+textarea{
+width:100%;
+height:120px;
+border:none;
+background:transparent;
+color:var(--text);
+resize:none;
+outline:none;
+}
+
+.todo input{
+width:100%;
+padding:8px;
+margin-bottom:10px;
+}
+
+.todo-item{
+display:flex;
+justify-content:space-between;
+margin-bottom:5px;
+}
+
+button{
+border:none;
+border-radius:8px;
+padding:6px 10px;
+cursor:pointer;
+}
+
+.controls{
+margin-bottom:10px;
+display:flex;
+gap:10px;
+}
+
+.news-item{
+font-size:14px;
+margin-bottom:6px;
+}
+
+@media(max-width:900px){
+.dashboard{
+grid-template-columns:1fr;
+}
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div id="clock"></div>
+<div id="date"></div>
+
+</header>
+
+<div class="search">
+
+<input id="search" placeholder="Search or command (yt cats)">
+<select id="engine">
+<option value="google">Google</option>
+<option value="duck">DuckDuckGo</option>
+<option value="bing">Bing</option>
+</select>
+
+<button onclick="search()">Search</button>
+
+</div>
+
+<div class="dashboard">
+
+<div>
+
+<div class="controls">
+<button onclick="addLink()">Add Link</button>
+<button onclick="toggleTheme()">Theme</button>
+</div>
+
+<div id="links" class="links"></div>
+
+</div>
+
+<div>
+
+<div class="widget">
+<h3>Weather</h3>
+<div id="weather">Loading...</div>
+</div>
+
+<div class="widget">
+<h3>Notes</h3>
+<textarea id="notes"></textarea>
+</div>
+
+<div class="widget todo">
+<h3>Todo</h3>
+<input id="todoInput" placeholder="Add task">
+<div id="todoList"></div>
+</div>
+
+<div class="widget">
+<h3>News</h3>
+<div id="news"></div>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+/* CLOCK */
+
+function updateClock(){
+let now=new Date()
+clock.innerText=now.toLocaleTimeString()
+date.innerText=now.toDateString()
+}
+
+setInterval(updateClock,1000)
+updateClock()
+
+
+/* SEARCH */
+
+function search(){
+
+let q=search.value.trim()
+
+if(q.startsWith("yt ")){
+location="https://youtube.com/results?search_query="+q.slice(3)
+return
+}
+
+if(q.startsWith("gh ")){
+location="https://github.com/search?q="+q.slice(3)
+return
+}
+
+let e=engine.value
+
+if(e==="google")
+location="https://google.com/search?q="+encodeURIComponent(q)
+
+if(e==="duck")
+location="https://duckduckgo.com/?q="+encodeURIComponent(q)
+
+if(e==="bing")
+location="https://bing.com/search?q="+encodeURIComponent(q)
+
+}
+
+document.addEventListener("keydown",e=>{
+if(e.key==="/"){
+e.preventDefault()
+search.focus()
+}
+if(e.key==="n") addLink()
+})
+
+
+/* LINKS */
+
+let links=JSON.parse(localStorage.getItem("links"))||[
+{name:"YouTube",url:"https://youtube.com"},
+{name:"Reddit",url:"https://reddit.com"},
+{name:"GitHub",url:"https://github.com"},
+{name:"Gmail",url:"https://mail.google.com"}
+]
+
+function renderLinks(){
+
+links.innerHTML=""
+
+links.forEach((l,i)=>{
+
+let div=document.createElement("div")
+div.className="tile"
+div.draggable=true
+
+let icon=`https://www.google.com/s2/favicons?domain=${l.url}&sz=64`
+
+div.innerHTML=`
+<img src="${icon}">
+${l.name}
+`
+
+div.onclick=()=>window.open(l.url)
+
+div.oncontextmenu=e=>{
+e.preventDefault()
+if(confirm("Delete?")){
+links.splice(i,1)
+saveLinks()
+}
+}
+
+div.ondragstart=e=>{
+e.dataTransfer.setData("index",i)
+}
+
+div.ondragover=e=>e.preventDefault()
+
+div.ondrop=e=>{
+let from=e.dataTransfer.getData("index")
+let temp=links[from]
+links.splice(from,1)
+links.splice(i,0,temp)
+saveLinks()
+}
+
+links.appendChild(div)
+
+})
+
+}
+
+function addLink(){
+
+let name=prompt("Name")
+if(!name) return
+
+let url=prompt("URL")
+if(!url) return
+
+links.push({name,url})
+saveLinks()
+
+}
+
+function saveLinks(){
+localStorage.setItem("links",JSON.stringify(links))
+renderLinks()
+}
+
+renderLinks()
+
+
+/* NOTES */
+
+notes.value=localStorage.getItem("notes")||""
+
+notes.oninput=()=>{
+localStorage.setItem("notes",notes.value)
+}
+
+
+/* TODO */
+
+let todos=JSON.parse(localStorage.getItem("todos"))||[]
+
+function renderTodos(){
+
+todoList.innerHTML=""
+
+todos.forEach((t,i)=>{
+
+let div=document.createElement("div")
+div.className="todo-item"
+
+div.innerHTML=`
+<span>${t}</span>
+<button onclick="removeTodo(${i})">X</button>
+`
+
+todoList.appendChild(div)
+
+})
+
+}
+
+todoInput.addEventListener("keydown",e=>{
+if(e.key==="Enter"){
+
+todos.push(todoInput.value)
+todoInput.value=""
+saveTodos()
+
+}
+})
+
+function removeTodo(i){
+todos.splice(i,1)
+saveTodos()
+}
+
+function saveTodos(){
+localStorage.setItem("todos",JSON.stringify(todos))
+renderTodos()
+}
+
+renderTodos()
+
+
+/* THEME */
+
+if(localStorage.getItem("theme")==="light")
+document.body.classList.add("light")
+
+function toggleTheme(){
+
+document.body.classList.toggle("light")
+
+localStorage.setItem(
+"theme",
+document.body.classList.contains("light")
+?"light":"dark"
+)
+
+}
+
+
+/* WEATHER */
+
+navigator.geolocation.getCurrentPosition(pos=>{
+
+let lat=pos.coords.latitude
+let lon=pos.coords.longitude
+
+fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
+.then(r=>r.json())
+.then(data=>{
+
+let w=data.current_weather
+
+weather.innerHTML=
+`Temp: ${w.temperature}°C<br>
+Wind: ${w.windspeed} km/h`
+
+})
+
+})
+
+
+/* NEWS */
+
+fetch("https://api.rss2json.com/v1/api.json?rss_url=https://feeds.bbci.co.uk/news/rss.xml")
+.then(r=>r.json())
+.then(data=>{
+
+news.innerHTML=""
+
+data.items.slice(0,5).forEach(n=>{
+
+let div=document.createElement("div")
+div.className="news-item"
+
+div.innerHTML=`<a href="${n.link}" target="_blank">${n.title}</a>`
+
+news.appendChild(div)
+
+})
+
+})
+
+
+/* RANDOM BACKGROUND */
+
+let images=[
+"https://picsum.photos/1920/1080?1",
+"https://picsum.photos/1920/1080?2",
+"https://picsum.photos/1920/1080?3"
+]
+
+document.body.style.backgroundImage=
+`url(${images[Math.floor(Math.random()*images.length)]})`
+
+document.body.style.backgroundSize="cover"
+document.body.style.backgroundPosition="center"
+
+</script>
+
+</body>
+</html>
