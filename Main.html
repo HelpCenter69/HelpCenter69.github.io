@@ -2,150 +2,122 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Super Startpage</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mobile Launcher</title>
 
 <style>
 
-:root{
---bg:#0f172a;
---card:#1e293b;
---text:#fff;
---accent:#3b82f6;
-}
-
-.light{
---bg:#f1f5f9;
---card:#ffffff;
---text:#111;
-}
-
 body{
 margin:0;
-font-family:system-ui;
-background:var(--bg);
-color:var(--text);
-transition:.3s;
+font-family:-apple-system, BlinkMacSystemFont, sans-serif;
+background:#0f172a;
+color:white;
+overflow:hidden;
 }
 
-header{
-text-align:center;
-padding:30px;
+/* widget area */
+
+.widget-area{
+padding:30px 20px 10px;
 }
 
-#clock{
-font-size:52px;
+.clock{
+font-size:42px;
+font-weight:600;
 }
 
-#date{
+.weather{
 opacity:.7;
 }
 
-.search{
+/* pages */
+
+.pages{
 display:flex;
-justify-content:center;
-gap:10px;
-margin-bottom:20px;
+height:calc(100vh - 120px);
+overflow:hidden;
+touch-action:pan-y;
 }
 
-.search input{
-width:320px;
-padding:12px;
-border-radius:10px;
-border:none;
+.page{
+min-width:100%;
+padding:10px;
+box-sizing:border-box;
 }
 
-.search button{
-padding:12px 16px;
-border:none;
-border-radius:10px;
-background:var(--accent);
-color:white;
-cursor:pointer;
-}
+/* grid */
 
-.dashboard{
+.grid{
 display:grid;
-grid-template-columns:2fr 1fr;
-gap:20px;
-padding:20px;
-max-width:1200px;
-margin:auto;
+grid-template-columns:repeat(4,1fr);
+gap:16px;
 }
 
-.links{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
-gap:15px;
-}
+/* icons */
 
-.tile{
-background:var(--card);
-border-radius:12px;
-padding:15px;
+.icon{
 text-align:center;
-cursor:move;
+font-size:12px;
 }
 
-.tile img{
-width:24px;
-height:24px;
+.icon img{
+width:60px;
+height:60px;
+border-radius:14px;
 display:block;
 margin:auto;
 margin-bottom:6px;
 }
 
-.widget{
-background:var(--card);
-padding:15px;
+/* dock */
+
+.dock{
+position:fixed;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+background:rgba(255,255,255,0.1);
+backdrop-filter:blur(20px);
+padding:10px 20px;
+border-radius:25px;
+display:flex;
+gap:20px;
+}
+
+/* search overlay */
+
+.search-overlay{
+position:fixed;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background:rgba(0,0,0,.8);
+display:none;
+flex-direction:column;
+padding:30px;
+}
+
+.search-overlay input{
+padding:14px;
+font-size:18px;
 border-radius:12px;
-margin-bottom:15px;
-}
-
-textarea{
-width:100%;
-height:120px;
 border:none;
-background:transparent;
-color:var(--text);
-resize:none;
-outline:none;
 }
 
-.todo input{
-width:100%;
-padding:8px;
-margin-bottom:10px;
-}
+/* add button */
 
-.todo-item{
-display:flex;
-justify-content:space-between;
-margin-bottom:5px;
-}
-
-button{
+.add{
+position:fixed;
+right:20px;
+bottom:90px;
+background:#3b82f6;
 border:none;
-border-radius:8px;
-padding:6px 10px;
-cursor:pointer;
-}
-
-.controls{
-margin-bottom:10px;
-display:flex;
-gap:10px;
-}
-
-.news-item{
-font-size:14px;
-margin-bottom:6px;
-}
-
-@media(max-width:900px){
-.dashboard{
-grid-template-columns:1fr;
-}
+color:white;
+font-size:20px;
+width:50px;
+height:50px;
+border-radius:50%;
 }
 
 </style>
@@ -153,64 +125,29 @@ grid-template-columns:1fr;
 
 <body>
 
-<header>
-
-<div id="clock"></div>
-<div id="date"></div>
-
-</header>
-
-<div class="search">
-
-<input id="search" placeholder="Search or command (yt cats)">
-<select id="engine">
-<option value="google">Google</option>
-<option value="duck">DuckDuckGo</option>
-<option value="bing">Bing</option>
-</select>
-
-<button onclick="search()">Search</button>
-
+<div class="widget-area">
+<div class="clock" id="clock"></div>
+<div class="weather" id="weather">Loading weather...</div>
 </div>
 
-<div class="dashboard">
+<div class="pages" id="pages">
 
-<div>
-
-<div class="controls">
-<button onclick="addLink()">Add Link</button>
-<button onclick="toggleTheme()">Theme</button>
+<div class="page">
+<div class="grid" id="grid"></div>
 </div>
 
-<div id="links" class="links"></div>
-
-</div>
-
-<div>
-
-<div class="widget">
-<h3>Weather</h3>
-<div id="weather">Loading...</div>
-</div>
-
-<div class="widget">
-<h3>Notes</h3>
-<textarea id="notes"></textarea>
-</div>
-
-<div class="widget todo">
-<h3>Todo</h3>
-<input id="todoInput" placeholder="Add task">
-<div id="todoList"></div>
-</div>
-
-<div class="widget">
-<h3>News</h3>
-<div id="news"></div>
+<div class="page">
+<div class="grid" id="grid2"></div>
 </div>
 
 </div>
 
+<button class="add" onclick="addApp()">+</button>
+
+<div class="dock" id="dock"></div>
+
+<div class="search-overlay" id="searchUI">
+<input id="searchInput" placeholder="Search or command">
 </div>
 
 <script>
@@ -219,739 +156,146 @@ grid-template-columns:1fr;
 
 function updateClock(){
 let now=new Date()
-clock.innerText=now.toLocaleTimeString()
-date.innerText=now.toDateString()
+clock.innerText=now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})
 }
 
 setInterval(updateClock,1000)
 updateClock()
 
 
-/* SEARCH */
+/* WEATHER */
 
-function search(){
+navigator.geolocation.getCurrentPosition(pos=>{
 
-let q=search.value.trim()
+fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&current_weather=true`)
+.then(r=>r.json())
+.then(d=>{
+weather.innerText=
+`${d.current_weather.temperature}°C • wind ${d.current_weather.windspeed}km/h`
+})
 
-if(q.startsWith("yt ")){
-location="https://youtube.com/results?search_query="+q.slice(3)
-return
-}
-
-if(q.startsWith("gh ")){
-location="https://github.com/search?q="+q.slice(3)
-return
-}
-
-let e=engine.value
-
-if(e==="google")
-location="https://google.com/search?q="+encodeURIComponent(q)
-
-if(e==="duck")
-location="https://duckduckgo.com/?q="+encodeURIComponent(q)
-
-if(e==="bing")
-location="https://bing.com/search?q="+encodeURIComponent(q)
-
-}
-
-document.addEventListener("keydown",e=>{
-if(e.key==="/"){
-e.preventDefault()
-search.focus()
-}
-if(e.key==="n") addLink()
 })
 
 
-/* LINKS */
+/* APPS */
 
-let links=JSON.parse(localStorage.getItem("links"))||[
+let apps=JSON.parse(localStorage.getItem("apps"))||[
 {name:"YouTube",url:"https://youtube.com"},
 {name:"Reddit",url:"https://reddit.com"},
 {name:"GitHub",url:"https://github.com"},
 {name:"Gmail",url:"https://mail.google.com"}
 ]
 
-function renderLinks(){
+function renderApps(){
 
-links.innerHTML=""
+grid.innerHTML=""
 
-links.forEach((l,i)=>{
+apps.forEach((a,i)=>{
 
 let div=document.createElement("div")
-div.className="tile"
-div.draggable=true
+div.className="icon"
 
-let icon=`https://www.google.com/s2/favicons?domain=${l.url}&sz=64`
+let icon=`https://www.google.com/s2/favicons?domain=${a.url}&sz=128`
 
 div.innerHTML=`
 <img src="${icon}">
-${l.name}
+${a.name}
 `
 
-div.onclick=()=>window.open(l.url)
+div.onclick=()=>window.open(a.url)
 
-div.oncontextmenu=e=>{
-e.preventDefault()
-if(confirm("Delete?")){
-links.splice(i,1)
-saveLinks()
+let holdTimer
+
+div.ontouchstart=()=>{
+holdTimer=setTimeout(()=>{
+if(confirm("Delete app?")){
+apps.splice(i,1)
+save()
 }
-}
-
-div.ondragstart=e=>{
-e.dataTransfer.setData("index",i)
-}
-
-div.ondragover=e=>e.preventDefault()
-
-div.ondrop=e=>{
-let from=e.dataTransfer.getData("index")
-let temp=links[from]
-links.splice(from,1)
-links.splice(i,0,temp)
-saveLinks()
+},700)
 }
 
-links.appendChild(div)
+div.ontouchend=()=>{
+clearTimeout(holdTimer)
+}
+
+grid.appendChild(div)
 
 })
 
 }
 
-function addLink(){
+function save(){
+localStorage.setItem("apps",JSON.stringify(apps))
+renderApps()
+}
 
-let name=prompt("Name")
+renderApps()
+
+
+/* ADD APP */
+
+function addApp(){
+
+let name=prompt("App name")
 if(!name) return
 
 let url=prompt("URL")
 if(!url) return
 
-links.push({name,url})
-saveLinks()
+apps.push({name,url})
+save()
 
 }
 
-function saveLinks(){
-localStorage.setItem("links",JSON.stringify(links))
-renderLinks()
-}
 
-renderLinks()
+/* SWIPE PAGES */
 
+let startX=0
 
-/* NOTES */
-
-notes.value=localStorage.getItem("notes")||""
-
-notes.oninput=()=>{
-localStorage.setItem("notes",notes.value)
-}
-
-
-/* TODO */
-
-let todos=JSON.parse(localStorage.getItem("todos"))||[]
-
-function renderTodos(){
-
-todoList.innerHTML=""
-
-todos.forEach((t,i)=>{
-
-let div=document.createElement("div")
-div.className="todo-item"
-
-div.innerHTML=`
-<span>${t}</span>
-<button onclick="removeTodo(${i})">X</button>
-`
-
-todoList.appendChild(div)
-
+pages.addEventListener("touchstart",e=>{
+startX=e.touches[0].clientX
 })
 
-}
+pages.addEventListener("touchend",e=>{
 
-todoInput.addEventListener("keydown",e=>{
-if(e.key==="Enter"){
+let endX=e.changedTouches[0].clientX
+let diff=startX-endX
 
-todos.push(todoInput.value)
-todoInput.value=""
-saveTodos()
+if(Math.abs(diff)>60){
 
-}
-})
-
-function removeTodo(i){
-todos.splice(i,1)
-saveTodos()
-}
-
-function saveTodos(){
-localStorage.setItem("todos",JSON.stringify(todos))
-renderTodos()
-}
-
-renderTodos()
-
-
-/* THEME */
-
-if(localStorage.getItem("theme")==="light")
-document.body.classList.add("light")
-
-function toggleTheme(){
-
-document.body.classList.toggle("light")
-
-localStorage.setItem(
-"theme",
-document.body.classList.contains("light")
-?"light":"dark"
-)
+if(diff>0)
+pages.scrollBy({left:window.innerWidth,behavior:"smooth"})
+else
+pages.scrollBy({left:-window.innerWidth,behavior:"smooth"})
 
 }
-
-
-/* WEATHER */
-
-navigator.geolocation.getCurrentPosition(pos=>{
-
-let lat=pos.coords.latitude
-let lon=pos.coords.longitude
-
-fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
-.then(r=>r.json())
-.then(data=>{
-
-let w=data.current_weather
-
-weather.innerHTML=
-`Temp: ${w.temperature}°C<br>
-Wind: ${w.windspeed} km/h`
 
 })
-
-})
-
-
-/* NEWS */
-
-fetch("https://api.rss2json.com/v1/api.json?rss_url=https://feeds.bbci.co.uk/news/rss.xml")
-.then(r=>r.json())
-.then(data=>{
-
-news.innerHTML=""
-
-data.items.slice(0,5).forEach(n=>{
-
-let div=document.createElement("div")
-div.className="news-item"
-
-div.innerHTML=`<a href="${n.link}" target="_blank">${n.title}</a>`
-
-news.appendChild(div)
-
-})
-
-})
-
-
-/* RANDOM BACKGROUND */
-
-let images=[
-"https://picsum.photos/1920/1080?1",
-"https://picsum.photos/1920/1080?2",
-"https://picsum.photos/1920/1080?3"
-]
-
-document.body.style.backgroundImage=
-`url(${images[Math.floor(Math.random()*images.length)]})`
-
-document.body.style.backgroundSize="cover"
-document.body.style.backgroundPosition="center"
-
-</script>
-
-</body>
-</html><!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Super Startpage</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<style>
-
-:root{
---bg:#0f172a;
---card:#1e293b;
---text:#fff;
---accent:#3b82f6;
-}
-
-.light{
---bg:#f1f5f9;
---card:#ffffff;
---text:#111;
-}
-
-body{
-margin:0;
-font-family:system-ui;
-background:var(--bg);
-color:var(--text);
-transition:.3s;
-}
-
-header{
-text-align:center;
-padding:30px;
-}
-
-#clock{
-font-size:52px;
-}
-
-#date{
-opacity:.7;
-}
-
-.search{
-display:flex;
-justify-content:center;
-gap:10px;
-margin-bottom:20px;
-}
-
-.search input{
-width:320px;
-padding:12px;
-border-radius:10px;
-border:none;
-}
-
-.search button{
-padding:12px 16px;
-border:none;
-border-radius:10px;
-background:var(--accent);
-color:white;
-cursor:pointer;
-}
-
-.dashboard{
-display:grid;
-grid-template-columns:2fr 1fr;
-gap:20px;
-padding:20px;
-max-width:1200px;
-margin:auto;
-}
-
-.links{
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
-gap:15px;
-}
-
-.tile{
-background:var(--card);
-border-radius:12px;
-padding:15px;
-text-align:center;
-cursor:move;
-}
-
-.tile img{
-width:24px;
-height:24px;
-display:block;
-margin:auto;
-margin-bottom:6px;
-}
-
-.widget{
-background:var(--card);
-padding:15px;
-border-radius:12px;
-margin-bottom:15px;
-}
-
-textarea{
-width:100%;
-height:120px;
-border:none;
-background:transparent;
-color:var(--text);
-resize:none;
-outline:none;
-}
-
-.todo input{
-width:100%;
-padding:8px;
-margin-bottom:10px;
-}
-
-.todo-item{
-display:flex;
-justify-content:space-between;
-margin-bottom:5px;
-}
-
-button{
-border:none;
-border-radius:8px;
-padding:6px 10px;
-cursor:pointer;
-}
-
-.controls{
-margin-bottom:10px;
-display:flex;
-gap:10px;
-}
-
-.news-item{
-font-size:14px;
-margin-bottom:6px;
-}
-
-@media(max-width:900px){
-.dashboard{
-grid-template-columns:1fr;
-}
-}
-
-</style>
-</head>
-
-<body>
-
-<header>
-
-<div id="clock"></div>
-<div id="date"></div>
-
-</header>
-
-<div class="search">
-
-<input id="search" placeholder="Search or command (yt cats)">
-<select id="engine">
-<option value="google">Google</option>
-<option value="duck">DuckDuckGo</option>
-<option value="bing">Bing</option>
-</select>
-
-<button onclick="search()">Search</button>
-
-</div>
-
-<div class="dashboard">
-
-<div>
-
-<div class="controls">
-<button onclick="addLink()">Add Link</button>
-<button onclick="toggleTheme()">Theme</button>
-</div>
-
-<div id="links" class="links"></div>
-
-</div>
-
-<div>
-
-<div class="widget">
-<h3>Weather</h3>
-<div id="weather">Loading...</div>
-</div>
-
-<div class="widget">
-<h3>Notes</h3>
-<textarea id="notes"></textarea>
-</div>
-
-<div class="widget todo">
-<h3>Todo</h3>
-<input id="todoInput" placeholder="Add task">
-<div id="todoList"></div>
-</div>
-
-<div class="widget">
-<h3>News</h3>
-<div id="news"></div>
-</div>
-
-</div>
-
-</div>
-
-<script>
-
-/* CLOCK */
-
-function updateClock(){
-let now=new Date()
-clock.innerText=now.toLocaleTimeString()
-date.innerText=now.toDateString()
-}
-
-setInterval(updateClock,1000)
-updateClock()
 
 
 /* SEARCH */
 
-function search(){
-
-let q=search.value.trim()
-
-if(q.startsWith("yt ")){
-location="https://youtube.com/results?search_query="+q.slice(3)
-return
-}
-
-if(q.startsWith("gh ")){
-location="https://github.com/search?q="+q.slice(3)
-return
-}
-
-let e=engine.value
-
-if(e==="google")
-location="https://google.com/search?q="+encodeURIComponent(q)
-
-if(e==="duck")
-location="https://duckduckgo.com/?q="+encodeURIComponent(q)
-
-if(e==="bing")
-location="https://bing.com/search?q="+encodeURIComponent(q)
-
-}
-
 document.addEventListener("keydown",e=>{
 if(e.key==="/"){
-e.preventDefault()
-search.focus()
+searchUI.style.display="flex"
+searchInput.focus()
 }
-if(e.key==="n") addLink()
 })
 
-
-/* LINKS */
-
-let links=JSON.parse(localStorage.getItem("links"))||[
-{name:"YouTube",url:"https://youtube.com"},
-{name:"Reddit",url:"https://reddit.com"},
-{name:"GitHub",url:"https://github.com"},
-{name:"Gmail",url:"https://mail.google.com"}
-]
-
-function renderLinks(){
-
-links.innerHTML=""
-
-links.forEach((l,i)=>{
-
-let div=document.createElement("div")
-div.className="tile"
-div.draggable=true
-
-let icon=`https://www.google.com/s2/favicons?domain=${l.url}&sz=64`
-
-div.innerHTML=`
-<img src="${icon}">
-${l.name}
-`
-
-div.onclick=()=>window.open(l.url)
-
-div.oncontextmenu=e=>{
-e.preventDefault()
-if(confirm("Delete?")){
-links.splice(i,1)
-saveLinks()
-}
-}
-
-div.ondragstart=e=>{
-e.dataTransfer.setData("index",i)
-}
-
-div.ondragover=e=>e.preventDefault()
-
-div.ondrop=e=>{
-let from=e.dataTransfer.getData("index")
-let temp=links[from]
-links.splice(from,1)
-links.splice(i,0,temp)
-saveLinks()
-}
-
-links.appendChild(div)
-
-})
-
-}
-
-function addLink(){
-
-let name=prompt("Name")
-if(!name) return
-
-let url=prompt("URL")
-if(!url) return
-
-links.push({name,url})
-saveLinks()
-
-}
-
-function saveLinks(){
-localStorage.setItem("links",JSON.stringify(links))
-renderLinks()
-}
-
-renderLinks()
-
-
-/* NOTES */
-
-notes.value=localStorage.getItem("notes")||""
-
-notes.oninput=()=>{
-localStorage.setItem("notes",notes.value)
-}
-
-
-/* TODO */
-
-let todos=JSON.parse(localStorage.getItem("todos"))||[]
-
-function renderTodos(){
-
-todoList.innerHTML=""
-
-todos.forEach((t,i)=>{
-
-let div=document.createElement("div")
-div.className="todo-item"
-
-div.innerHTML=`
-<span>${t}</span>
-<button onclick="removeTodo(${i})">X</button>
-`
-
-todoList.appendChild(div)
-
-})
-
-}
-
-todoInput.addEventListener("keydown",e=>{
+searchInput.addEventListener("keydown",e=>{
 if(e.key==="Enter"){
 
-todos.push(todoInput.value)
-todoInput.value=""
-saveTodos()
+let q=searchInput.value
+
+if(q.startsWith("yt "))
+location="https://youtube.com/results?search_query="+q.slice(3)
+
+else
+location="https://google.com/search?q="+q
 
 }
 })
-
-function removeTodo(i){
-todos.splice(i,1)
-saveTodos()
-}
-
-function saveTodos(){
-localStorage.setItem("todos",JSON.stringify(todos))
-renderTodos()
-}
-
-renderTodos()
-
-
-/* THEME */
-
-if(localStorage.getItem("theme")==="light")
-document.body.classList.add("light")
-
-function toggleTheme(){
-
-document.body.classList.toggle("light")
-
-localStorage.setItem(
-"theme",
-document.body.classList.contains("light")
-?"light":"dark"
-)
-
-}
-
-
-/* WEATHER */
-
-navigator.geolocation.getCurrentPosition(pos=>{
-
-let lat=pos.coords.latitude
-let lon=pos.coords.longitude
-
-fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
-.then(r=>r.json())
-.then(data=>{
-
-let w=data.current_weather
-
-weather.innerHTML=
-`Temp: ${w.temperature}°C<br>
-Wind: ${w.windspeed} km/h`
-
-})
-
-})
-
-
-/* NEWS */
-
-fetch("https://api.rss2json.com/v1/api.json?rss_url=https://feeds.bbci.co.uk/news/rss.xml")
-.then(r=>r.json())
-.then(data=>{
-
-news.innerHTML=""
-
-data.items.slice(0,5).forEach(n=>{
-
-let div=document.createElement("div")
-div.className="news-item"
-
-div.innerHTML=`<a href="${n.link}" target="_blank">${n.title}</a>`
-
-news.appendChild(div)
-
-})
-
-})
-
-
-/* RANDOM BACKGROUND */
-
-let images=[
-"https://picsum.photos/1920/1080?1",
-"https://picsum.photos/1920/1080?2",
-"https://picsum.photos/1920/1080?3"
-]
-
-document.body.style.backgroundImage=
-`url(${images[Math.floor(Math.random()*images.length)]})`
-
-document.body.style.backgroundSize="cover"
-document.body.style.backgroundPosition="center"
 
 </script>
 
