@@ -1,0 +1,104 @@
+body{
+margin:0;
+font-family:-apple-system;
+background:#0f172a;
+color:white;
+overflow:hidden;
+}
+
+/* statusbar */
+
+#statusbar{
+padding:10px;
+text-align:center;
+font-size:14px;
+}
+
+/* widgets */
+
+#widgets{
+padding:10px;
+}
+
+/* launcher */
+
+#launcher{
+display:flex;
+overflow:hidden;
+height:70vh;
+}
+
+.page{
+min-width:100%;
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:18px;
+padding:20px;
+}
+
+/* icons */
+
+.icon{
+text-align:center;
+font-size:12px;
+}
+
+.icon img{
+width:64px;
+height:64px;
+border-radius:16px;
+}
+
+/* dock */
+
+#dock{
+position:fixed;
+bottom:15px;
+left:50%;
+transform:translateX(-50%);
+display:flex;
+gap:20px;
+background:rgba(255,255,255,0.1);
+padding:10px 20px;
+border-radius:30px;
+backdrop-filter:blur(20px);
+}
+
+/* spotlight */
+
+#spotlight{
+position:fixed;
+top:0;
+left:0;
+right:0;
+bottom:0;
+display:none;
+background:rgba(0,0,0,.9);
+flex-direction:column;
+padding:30px;
+}
+
+#searchInput{
+padding:14px;
+border-radius:12px;
+border:none;
+font-size:18px;
+}
+
+/* browser */
+
+#browser{
+position:fixed;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background:black;
+display:none;
+flex-direction:column;
+}
+
+#frame{
+flex:1;
+border:none;
+}
