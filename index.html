@@ -1,66 +1,92 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mobile Launcher</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<style>
+<title>WebOS</title>
 
-body{
-margin:0;
-font-family:-apple-system, BlinkMacSystemFont, sans-serif;
-background:#0f172a;
-color:white;
-overflow:hidden;
-}
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
 
-/* widget area */
+</head>
 
-.widget-area{
-padding:30px 20px 10px;
-}
+<body>
 
-.clock{
-font-size:42px;
-font-weight:600;
-}
+<!-- STATUS BAR -->
 
-.weather{
-opacity:.7;
-}
+<div id="statusbar">
+<div id="clock"></div>
+</div>
 
-/* pages */
+<!-- WIDGETS -->
 
-.pages{
-display:flex;
-height:calc(100vh - 120px);
-overflow:hidden;
-touch-action:pan-y;
-}
+<div id="widgets">
 
-.page{
-min-width:100%;
-padding:10px;
-box-sizing:border-box;
-}
+<div class="widget" id="weather"></div>
 
-/* grid */
+</div>
 
-.grid{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:16px;
-}
+<!-- LAUNCHER -->
 
-/* icons */
+<div id="launcher">
 
-.icon{
-text-align:center;
-font-size:12px;
-}
+<div class="page" id="page1"></div>
+<div class="page" id="page2"></div>
 
-.icon img{
+</div>
+
+<!-- DOCK -->
+
+<div id="dock"></div>
+
+<!-- SPOTLIGHT -->
+
+<div id="spotlight">
+
+<input id="searchInput" placeholder="Search apps or web">
+
+<div id="results"></div>
+
+</div>
+
+<!-- FOLDER -->
+
+<div id="folder">
+
+<div id="folderApps"></div>
+
+</div>
+
+<!-- BROWSER -->
+
+<div id="browser">
+
+<div id="browserBar">
+
+<button id="backBtn">←</button>
+
+<input id="urlBar">
+
+<button id="goBtn">Go</button>
+
+</div>
+
+<div id="tabs"></div>
+
+<iframe id="frame"></iframe>
+
+</div>
+
+<script src="storage.js"></script>
+<script src="launcher.js"></script>
+<script src="browser.js"></script>
+<script src="spotlight.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>.icon img{
 width:60px;
 height:60px;
 border-radius:14px;
